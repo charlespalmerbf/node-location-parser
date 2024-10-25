@@ -5,13 +5,15 @@ function getDistance(lat1, lng1, lat2, lng2) {
     const R = 3958.8; // Radius of the Earth in miles
     const dLat = (lat2 - lat1) * (Math.PI / 180);
     const dLng = (lng2 - lng1) * (Math.PI / 180);
-    const a = 
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
-      Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * (Math.PI / 180)) *
+            Math.cos(lat2 * (Math.PI / 180)) *
+            Math.sin(dLng / 2) *
+            Math.sin(dLng / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c; // Distance in miles
-  }
+}
 
 // Array of search locations
 const searchLocations = [
@@ -1765,36 +1767,57 @@ const searchLocations = [
     { name: "Westminster", lat: 51.4955, lng: -0.1422 },
     { name: "City of London", lat: 51.5155, lng: -0.0922 },
     { name: "Lambeth and Southwark", lat: 51.4635, lng: -0.1 },
+    { name: "London", lat: 51.5074, lng: -0.1278 },
+    { name: "England", lat: 52.5091, lng: -1.9956 },
 ];
 
 // Function to find the 5 closest locations within 50 miles
 function findClosestLocationsWithin50Miles(currentLocation, locations) {
-  return locations
-    .filter(location => {
-      if (location.name === currentLocation.name) return false;
-      const distance = getDistance(currentLocation.lat, currentLocation.lng, location.lat, location.lng);
-      return distance <= 50;  // Only consider locations within 50 miles
-    })
-    .map(location => ({
-      name: location.name,
-      distance: getDistance(currentLocation.lat, currentLocation.lng, location.lat, location.lng)
-    }))
-    .sort((a, b) => a.distance - b.distance)  // Sort by distance
-    .slice(0, 5);  // Pick the top 5 closest
+    return locations
+        .filter((location) => {
+            if (location.name === currentLocation.name) return false;
+            const distance = getDistance(
+                currentLocation.lat,
+                currentLocation.lng,
+                location.lat,
+                location.lng
+            );
+            return distance <= 50; // Only consider locations within 50 miles
+        })
+        .map((location) => ({
+            name: location.name,
+            distance: getDistance(
+                currentLocation.lat,
+                currentLocation.lng,
+                location.lat,
+                location.lng
+            ),
+        }))
+        .sort((a, b) => a.distance - b.distance) // Sort by distance
+        .slice(0, 5); // Pick the top 5 closest
 }
 
 // Add closest locations within 50 miles to each item
-searchLocations.forEach(location => {
-  const closestLocations = findClosestLocationsWithin50Miles(location, searchLocations);
-  location.closestLocations = closestLocations.map(loc => loc.name);  // Store only the names of the closest locations
-  
-  // Log if no nearby locations are found within 50 miles
-  if (closestLocations.length === 0) {
-    console.log(`No nearby locations found within 50 miles for ${location.name}`);
-  }
+searchLocations.forEach((location) => {
+    const closestLocations = findClosestLocationsWithin50Miles(
+        location,
+        searchLocations
+    );
+    location.closestLocations = closestLocations.map((loc) => loc.name); // Store only the names of the closest locations
+
+    // Log if no nearby locations are found within 50 miles
+    if (closestLocations.length === 0) {
+        console.log(
+            `No nearby locations found within 50 miles for ${location.name}`
+        );
+    }
 });
 
 // Save the updated array to a JSON file
-fs.writeFileSync('updatedLocations.json', JSON.stringify(searchLocations, null, 2), 'utf-8');
+fs.writeFileSync(
+    "updatedLocations.json",
+    JSON.stringify(searchLocations, null, 2),
+    "utf-8"
+);
 
-console.log('Updated locations saved to updatedLocations.json');
+console.log("Updated locations saved to updatedLocations.json");
